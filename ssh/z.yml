@@ -1,0 +1,42 @@
+# @version ">=2.0"
+
+ssh_socket: ./.ssh.socket
+
+tasks:
+    ssh.init:
+        help: "Intialize socket connection"
+        unless: ssh.is_initialized(envs[target_env].ssh)
+        args:
+            target_env: ?
+        do:  @(with true as INTERACTIVE) ssh -NCfgM -S $(ssh_socket) -o "ExitOnForwardFailure yes" -o "ServerAliveInterval 180" $(envs[target_env].ssh)
+    ssh.open:
+        help: "Open the ssh connection"
+        args:
+            target_env: ?
+        do: @(with true as INTERACTIVE) ssh -S $(ssh_socket) $(envs[target_env].ssh)
+    ssh.forward:
+        help: "Intialize portforward"
+        args:
+            target_env: ?
+            forward: ?
+        do: ssh -S $(ssh_socket) -O forward -L $(forward) $(envs[target_env].ssh)
+    ssh.cancel:
+        help: "Cancel forwardings"
+        args:
+            target_env: ?
+        do: ssh -S $(ssh_socket) -O cancel $(envs[target_env].ssh)
+    ssh.stop:
+        help: "Request the master to stop accepting further multiplexing requests"
+        args:
+            target_env: ?
+        do: ssh -S $(ssh_socket) -O stop $(envs[target_env].ssh)
+    ssh.exit:
+        help: "Request the master to exit"
+        args:
+            target_env: ?
+        do: ssh -S $(ssh_socket) -O exit $(envs[target_env].ssh)
+    ssh.status:
+        help: "Check that the master process is running"
+        args:
+            target_env: ?
+        do: ssh -S $(ssh_socket) -O check  $(envs[target_env].ssh)
