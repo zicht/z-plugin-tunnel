@@ -16,7 +16,7 @@ tasks:
             args: ~
         args:
             target_env: ?
-        do:  @(with true as INTERACTIVE) ssh -NC$(background ? "f")gM$(args) -S $(tunnel.get.socket) $(tunnel.get.options) $(envs[target_env].ssh)
+        do:  @(with true as INTERACTIVE) ssh -C$(background ? "Nf")gM$(args) -S $(tunnel.get.socket) $(tunnel.get.options) $(envs[target_env].ssh)
     tunnel.open:
         help: "Open the ssh connection"
         args:
