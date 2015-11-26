@@ -1,6 +1,6 @@
 {
-    "name": "zicht/z-plugin-ssh",
-    "description": "'ssh socket' plugin for Z",
+    "name": "zicht/z-plugin-tunnel",
+    "description": "'ssh tunnel' plugin for Z",
     "require": {
         "php": ">=5.3.3"
     },

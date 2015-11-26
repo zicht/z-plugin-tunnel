@@ -7,6 +7,7 @@
  */
 namespace Zicht\Tool\Plugin\Ssh;
 
+use Zicht\Tool\Command\HelpCommand;
 use Zicht\Tool\Plugin as BasePlugin;
 use Zicht\Tool\Container\Container;
 use Symfony\Component\Process\Process;
@@ -24,17 +25,51 @@ class Plugin extends BasePlugin
     {
         $rootNode
             ->children()
-                ->scalarNode('ssh_socket')->end()
+                ->arrayNode('tunnel')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('socket')->end()
+                        ->arrayNode('options')
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }
 
     public function setContainer(Container $container)
     {
-        $container->fn(array('ssh','is_initialized'), function($ssh) {
-            return preg_match('#^Master running (pid=\d+)$#', trim(shell_exec('ssh -S tmp.sock -O check ' . $ssh . " 2>&1 1> /dev/null")));
-
+        $container->fn(array('tunnel','is_acitve'), function(Container $c, $ssh, $socket) {
+            return preg_match(
+                '#^Master running (pid=\d+)$#',
+                trim(shell_exec(sprintf('%s 2>&1 1> /dev/null', $c->call($c->resolve(['tunnel','cmd','check']), $socket, $ssh))))
+            );
+        }, true);
+        $container->decl(['tunnel','get','options'], function(Container $c) {
+            if (!empty($c->resolve(['tunnel', 'options']))) {
+                foreach ($c->resolve(['tunnel', 'options']) as $name => $value) {
+                    $options[] =  sprintf('-o "%s %s"', $name, $value);
+                }
+                return !empty($options) ? implode(" ", $options) : null;
+            } else {
+                return null;
+            }
         });
+        $container->decl(['tunnel','get','socket'], function(Container $c) {
 
+            if (false !== $c->has(['tunnel','socket']) && !empty($c->resolve(['tunnel', 'socket']))) {
+                return $c->resolve(['tunnel','socket']);
+            } else {
+                $folder = sprintf('%s/%s', sys_get_temp_dir(), sha1(getenv('USER')));
+                if (false === is_dir($folder)) {
+                    mkdir($folder, 0700, true);
+                }
+                return sprintf('%s/%s.socket', $folder, $c->resolve('envs')[$c->resolve('target_env')]['ssh']);
+            }
+        });
+        $container->fn(['tunnel','cmd','check'], function($socket, $ssh) {
+           return sprintf('ssh -S %s -O check %s', $socket, $ssh);
+        });
     }
 }
