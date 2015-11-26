@@ -5,9 +5,8 @@
  * @date      11/25/15
  * @time      3:36 PM
  */
-namespace Zicht\Tool\Plugin\Ssh;
+namespace Zicht\Tool\Plugin\Tunnel;
 
-use Zicht\Tool\Command\HelpCommand;
 use Zicht\Tool\Plugin as BasePlugin;
 use Zicht\Tool\Container\Container;
 use Symfony\Component\Process\Process;
