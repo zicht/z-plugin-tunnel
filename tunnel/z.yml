@@ -8,7 +8,7 @@ tunnel:
 
 tasks:
     tunnel.init:
-        help: "Intialize socket connection"
+        help: "Intialize shared (socket) connection"
         unless: tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         flags:
             background: true
@@ -18,13 +18,13 @@ tasks:
             target_env: ?
         do:  @(with true as INTERACTIVE) ssh -C$(background ? "Nf")gM$(args) -S $(tunnel.get.socket) $(tunnel.get.options) $(envs[target_env].ssh)
     tunnel.open:
-        help: "Open the ssh connection"
+        help: "Open the ssh connection (thru the shared connection)"
         unless: !tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         args:
             target_env: ?
         do: @(with true as INTERACTIVE) ssh -S $(tunnel.get.socket) $(envs[target_env].ssh)
     tunnel.forward:
-        help: "Intialize portforward"
+        help: "Add portforward"
         unless: !tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         args:
             target_env: ?
