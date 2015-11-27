@@ -41,9 +41,16 @@ class Plugin extends BasePlugin
     {
         $container->fn(array('tunnel','is_acitve'), function(Container $c, $ssh, $socket) {
             try{
+                // Check if socke exists
+                $c->helperExec(sprintf('[ -S %s ] && exit 0 || exit 255', $socket));
+            } catch (\UnexpectedValueException $e) {
+                return false;
+            }
+            try{
+                // Check if connection  is active
                 $c->helperExec($c->call($c->resolve(['tunnel','cmd','check']), $socket, $ssh));
                 return true;
-            } catch (\Exception $e) {
+            } catch (\UnexpectedValueException $e) {
                 return false;
             }
         }, true);

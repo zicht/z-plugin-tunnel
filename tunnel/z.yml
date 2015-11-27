@@ -19,27 +19,32 @@ tasks:
         do:  @(with true as INTERACTIVE) ssh -C$(background ? "Nf")gM$(args) -S $(tunnel.get.socket) $(tunnel.get.options) $(envs[target_env].ssh)
     tunnel.open:
         help: "Open the ssh connection"
+        unless: !tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         args:
             target_env: ?
         do: @(with true as INTERACTIVE) ssh -S $(tunnel.get.socket) $(envs[target_env].ssh)
     tunnel.forward:
         help: "Intialize portforward"
+        unless: !tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         args:
             target_env: ?
             forward: ?
         do: ssh -S $(tunnel.get.socket) -O forward -L $(forward) $(envs[target_env].ssh)
     tunnel.cancel:
         help: "Cancel forwardings"
+        unless: !tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         args:
             target_env: ?
         do: ssh -S $(tunnel.get.socket) -O cancel $(envs[target_env].ssh)
     tunnel.stop:
         help: "Request the master to stop accepting further multiplexing requests"
+        unless: !tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         args:
             target_env: ?
         do: ssh -S $(tunnel.get.socket) -O stop $(envs[target_env].ssh)
     tunnel.exit:
         help: "Request the master to exit"
+        unless: !tunnel.is_acitve(envs[target_env].ssh, tunnel.get.socket)
         args:
             target_env: ?
         do: ssh -S $(tunnel.get.socket) -O exit $(envs[target_env].ssh)
