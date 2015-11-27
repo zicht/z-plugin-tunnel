@@ -21,28 +21,28 @@ tasks:
         help: "Open the ssh connection"
         args:
             target_env: ?
-        do: @(with true as INTERACTIVE) ssh -S $(tunnel.get.ssh_socket) $(envs[target_env].ssh)
+        do: @(with true as INTERACTIVE) ssh -S $(tunnel.get.socket) $(envs[target_env].ssh)
     tunnel.forward:
         help: "Intialize portforward"
         args:
             target_env: ?
             forward: ?
-        do: ssh -S $(tunnel.get.ssh_socket) -O forward -L $(forward) $(envs[target_env].ssh)
+        do: ssh -S $(tunnel.get.socket) -O forward -L $(forward) $(envs[target_env].ssh)
     tunnel.cancel:
         help: "Cancel forwardings"
         args:
             target_env: ?
-        do: ssh -S $(tunnel.get.ssh_socket) -O cancel $(envs[target_env].ssh)
+        do: ssh -S $(tunnel.get.socket) -O cancel $(envs[target_env].ssh)
     tunnel.stop:
         help: "Request the master to stop accepting further multiplexing requests"
         args:
             target_env: ?
-        do: ssh -S $(tunnel.get.ssh_socket) -O stop $(envs[target_env].ssh)
+        do: ssh -S $(tunnel.get.socket) -O stop $(envs[target_env].ssh)
     tunnel.exit:
         help: "Request the master to exit"
         args:
             target_env: ?
-        do: ssh -S $(tunnel.get.ssh_socket) -O exit $(envs[target_env].ssh)
+        do: ssh -S $(tunnel.get.socket) -O exit $(envs[target_env].ssh)
     tunnel.status:
         help: "Check that the master process is running"
         args:
