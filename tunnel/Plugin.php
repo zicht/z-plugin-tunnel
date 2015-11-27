@@ -40,10 +40,12 @@ class Plugin extends BasePlugin
     public function setContainer(Container $container)
     {
         $container->fn(array('tunnel','is_acitve'), function(Container $c, $ssh, $socket) {
-            return preg_match(
-                '#^Master running (pid=\d+)$#',
-                trim(shell_exec(sprintf('%s 2>&1 1> /dev/null', $c->call($c->resolve(['tunnel','cmd','check']), $socket, $ssh))))
-            );
+            try{
+                $c->helperExec($c->call($c->resolve(['tunnel','cmd','check']), $socket, $ssh));
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
         }, true);
         $container->decl(['tunnel','get','options'], function(Container $c) {
             if (!empty($c->resolve(['tunnel', 'options']))) {
